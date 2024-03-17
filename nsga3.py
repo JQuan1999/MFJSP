@@ -14,7 +14,7 @@ np.random.seed(1)
 random.seed(1)
 sys.setrecursionlimit(10000)  # 设置递归深度限制为10000或更高
 
-iter_max = 100  # 迭代次数
+iter_max = 1  # 迭代次数
 pop_size = 120  # 种群数目
 mobj = 4  # 目标函数个数
 pc, pm = 0.9, 0.1  # 交叉、变异概率
@@ -22,8 +22,8 @@ local_search_iter = 10 # 个体局部搜索深度
 tourment_select_size = 10 # 局部搜索锦标赛大小
 pls = 0.1 # 局部搜索概率
 
-testdir = "./orb"
-resultdir = "./result/nsga3"
+testdir = "./la"
+resultdir = "./result/nsga3/test"
 
 
 def NSGA3(data: str = './test/None', result: str = './result/None') -> np.ndarray:

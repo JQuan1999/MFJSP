@@ -434,26 +434,53 @@ class MachineArray:
                     seq[i-1].rpre_cnt += 1 # i-1反向入度+1
         return sequences
 
-    def Gatta(self, t = 1):
-        plt.yticks(np.arange(len(self.machines) + 1))
+    def Gatta(self, job_count: int, title: str = '', savefile: str = ''):
+        """
+            绘制机器上的加工甘特图
+        :param job_count: 工件数目
+        :param title: 甘特图标题
+        :param savefile: 甘特图保存文件路径
+        :return:
+        """
+        labels = [f"J{idx+1}" for idx in range(job_count)]
+        colormap = plt.get_cmap('RdYlGn')
+        category_colors = colormap(np.linspace(0.1, 0.85, job_count))
+        label_set = set()
+        max_end = 0
+        plt.gca().spines['right'].set_color('none')
+        plt.gca().spines['top'].set_color('none')
         for i in range(len(self.machines)):
             m = self.machines[i]
             for j in range(len(m.sequence)):
                 op = m.sequence[j]
                 job_index, op_index = op.job_idx, op.op_idx
-                c_index = job_index % len(self.color)
                 start, end = m.begin_times[j], m.end_times[j]
                 pt = end - start
-                plt.barh(i + 0.5, pt, height=1, left=start, align='center', color=self.color[c_index], edgecolor='grey')
-                # plt.text(start + pt / 8, i+0.5, '{}-{}\n{}'.format(job_index + 1, op_index + 1, pt), fontsize=10, color='tan')
-                if pt <= 2:
-                    plt.text(start + pt / 8, i + 0.5, '{}-{}\n{}'.format(job_index + 1, op_index + 1, pt), fontsize=10, color='tan')
+                label = labels[job_index]
+                max_end = max(max_end, end)
+                if label not in label_set:
+                    plt.barh(i + 0.5, pt, height=1, left=start, align='center', color=category_colors[job_index],
+                             edgecolor='grey', label=labels[job_index])
+                    label_set.add(label)
                 else:
-                    plt.text(start + pt / 2, i + 0.5, '{}-{}\n{}'.format(job_index + 1, op_index + 1, pt), fontsize=10, color='tan')
-        plt.ticklabel_format(axis='both', style='sci', scilimits=[-1, 2])
-        plt.xlabel('时间')
-        plt.ylabel('加工机器')
-        plt.pause(t)
+                    plt.barh(i + 0.5, pt, height=1, left=start, align='center', color=category_colors[job_index],
+                             edgecolor='grey')
+                # plt.text(start + pt / 8, i+0.5, '{}-{}\n{}'.format(job_index + 1, op_index + 1, pt), fontsize=10, color='tan')
+                # if pt <= 2:
+                #     plt.text(start + pt / 8, i + 0.5, '{}-{}\n{}'.format(job_index + 1, op_index + 1, pt), fontsize=10, color='tan')
+                # else:
+                #     plt.text(start + pt / 2, i + 0.5, '{}-{}\n{}'.format(job_index + 1, op_index + 1, pt), fontsize=10, color='tan')
+        plt.title(title, y=1.05, fontsize='small')
+        plt.yticks(np.arange(len(self.machines) + 1))
+        # plt.ticklabel_format(axis='both', style='sci', scilimits=[-1, 2])
+        plt.xlim(0, max_end + max_end / 10)
+        plt.xlabel('Time', fontsize='small')
+        plt.ylabel('Machine', fontsize='small')
+        plt.legend(ncol=2, bbox_to_anchor=(1.15, 1.15), loc='upper right', fontsize='small')
+        if savefile != '':
+            plt.savefig(savefile, dpi=400, format='png')
+        else:
+            plt.pause(10)
         plt.close()
 
     def DebugInfo(self):

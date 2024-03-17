@@ -148,10 +148,10 @@ class Chromosome:
         for i in range(self.job_num):
             assert self.opnum_array[i] == vis_times[i]
 
-    def GetMachineCode(self) -> [[int]]:
+    def GetMachineCode(self) -> [np.ndarray]:
         return self._mc
 
-    def GetJobCode(self) -> [[int]]:
+    def GetJobCode(self) -> [np.ndarray]:
         return self._jc
 
     def ChangeCode(self, mcode, jcode):
@@ -332,7 +332,15 @@ class Population:
     def Save(self, file: str):
         obj_values = np.array(self.obj_curve)
         popfun = self.popfun
-        np.savez(file, obj_values, popfun)
+        code_len = self.job_array.OperationNum()
+        jc_code = np.array([], dtype=int)
+        mc_code = np.array([])
+        for chrome in self.pop:
+            jc_code = np.concatenate((jc_code, chrome.GetJobCode()))
+            mc_code = np.concatenate((mc_code, chrome.GetMachineCode()))
+        jc_code = jc_code.reshape((-1, code_len))
+        mc_code = mc_code.reshape((-1, code_len))
+        np.savez(file, obj_values, popfun, jc_code, mc_code)
 
 
 def Normalize(popfun: np.ndarray, zmin: np.ndarray, zmax:  np.ndarray) -> np.ndarray:

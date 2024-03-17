@@ -399,6 +399,8 @@ class LocalSearch:
         best_obj = Normalize(best_obj, zmin, zmax)
         # 计算加权best value
         best_value = np.dot(np.array(weight_vector), np.array(best_obj))
+        if best_value < 0:
+            print(f"best value {best_value} < 0")
         assert best_value >= 0
         # print(f"==========local serarch for individual init best obj {best_obj} value {best_value}============")
         iter = 0
